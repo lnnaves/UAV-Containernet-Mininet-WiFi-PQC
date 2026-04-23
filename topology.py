@@ -43,6 +43,11 @@ def topology():
     nodes = net.stations
     telemetry(nodes=nodes, single=True, data_type='position')
 
+    info("*** Iniciando o Socket Server para receber coordenadas\n")
+    net.socketServer(ip='127.0.0.1', port=12345)
+
+    info("*** Habilitando o gráfico de visualização\n")
+    net.plotGraph(max_x=100, max_y=100)
 
     info("*** Running CLI\n")
     CLI(net) 
