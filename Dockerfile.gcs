@@ -1,0 +1,28 @@
+# Mudamos para '3.9-slim-bookworm' que está com os repositórios ativos
+FROM python:3.9-slim-bookworm
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Instalando dependências (Bookworm tem repositórios atualizados)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libxml2-dev \
+    libxslt-dev \
+    zlib1g-dev \
+    gcc \
+    python3-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# No Debian Bookworm, precisamos usar a flag --break-system-packages 
+# para instalar via pip fora de um venv, o que é seguro dentro de um container
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir MAVProxy pymavlink --break-system-packages
+
+WORKDIR /app
+
+EXPOSE 14550/udp
+
+CMD ["mavproxy.py", "--master=udp:0.0.0.0:14550", "--console"]
